@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password"), // nullable for Replit Auth users
   payCycle: text("pay_cycle").default("fortnightly"),
+  payCycleStartDate: timestamp("pay_cycle_start_date"), // When first income payment started
   budgetName: text("budget_name").default("Personal Budget"),
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
   twoFactorSecret: text("two_factor_secret"), // TOTP secret key

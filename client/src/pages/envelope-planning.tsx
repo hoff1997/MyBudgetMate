@@ -76,38 +76,35 @@ const calculateRequiredContribution = (dueAmount: number, dueFrequency: string, 
   return dueAmount / payPeriods;
 };
 
-const calculateExpectedBalance = (envelope: PlanningEnvelope): number => {
-  if (!envelope.contributionAmount || !envelope.dueDate) {
+const calculateExpectedBalance = (envelope: PlanningEnvelope, payCycleStartDate: Date | null, payFrequency: string): number => {
+  if (!envelope.contributionAmount || !envelope.dueDate || !payCycleStartDate) {
     return envelope.openingBalance;
   }
 
   const now = new Date();
   const dueDate = new Date(envelope.dueDate);
+  const startDate = new Date(payCycleStartDate);
   
   // If due date is in the past, expected balance should be the due amount
   if (dueDate <= now) {
     return envelope.dueAmount;
   }
   
-  // Calculate what percentage of time has passed from start of year to due date
-  const startDate = new Date(now.getFullYear(), 0, 1); // January 1st of current year
-  const totalDays = Math.floor((dueDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  const elapsedDays = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  
-  if (totalDays <= 0 || elapsedDays <= 0) {
+  // If we haven't reached the start date yet, return opening balance
+  if (now < startDate) {
     return envelope.openingBalance;
   }
   
-  // Calculate how much we need to save total (due amount minus opening balance)
-  const totalToSave = envelope.dueAmount - envelope.openingBalance;
+  // Calculate how many pay periods have occurred since start date
+  const payPeriodDays = payFrequency === 'weekly' ? 7 : payFrequency === 'fortnightly' ? 14 : 30; // approximate for monthly
+  const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const payPeriodsElapsed = Math.floor(daysSinceStart / payPeriodDays);
   
-  // Calculate progress as percentage of time elapsed
-  const progressPercentage = Math.min(elapsedDays / totalDays, 1);
+  // Expected balance = opening balance + (pay periods elapsed × contribution amount)
+  const expectedBalance = envelope.openingBalance + (payPeriodsElapsed * envelope.contributionAmount);
   
-  // Expected balance = opening balance + (percentage of total to save)
-  const expectedBalance = envelope.openingBalance + (totalToSave * progressPercentage);
-  
-  return Math.max(expectedBalance, envelope.openingBalance);
+  // Don't exceed the due amount
+  return Math.min(expectedBalance, envelope.dueAmount);
 };
 
 const getStatus = (actual: number, expected: number): 'under' | 'on-track' | 'over' => {
@@ -202,9 +199,15 @@ export default function EnvelopePlanning() {
     queryKey: ["/api/envelope-categories"],
   });
 
+  // Load user data for pay cycle settings
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
   const [planningEnvelopes, setPlanningEnvelopes] = useState<PlanningEnvelope[]>([]);
   const [editingCell, setEditingCell] = useState<{ rowIndex: number; field: string } | null>(null);
   const [payFrequency, setPayFrequency] = useState<'weekly' | 'fortnightly' | 'monthly'>('monthly');
+  const [payCycleStartDate, setPayCycleStartDate] = useState<Date | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
   const [showEnvelopeDialog, setShowEnvelopeDialog] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
@@ -245,6 +248,47 @@ export default function EnvelopePlanning() {
       });
     },
   });
+
+  // Mutation to update user settings (including pay cycle start date)
+  const updateUserSettingsMutation = useMutation({
+    mutationFn: async (updates: { payCycleStartDate?: Date }) => {
+      const userData: any = {};
+      if (updates.payCycleStartDate !== undefined) {
+        userData.payCycleStartDate = updates.payCycleStartDate?.toISOString() || null;
+      }
+      return apiRequest("PATCH", "/api/user/settings", userData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      toast({
+        title: "Success", 
+        description: "Pay cycle settings updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update pay cycle settings",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Initialize pay cycle start date from user data
+  useEffect(() => {
+    if (userData?.payCycleStartDate) {
+      setPayCycleStartDate(new Date(userData.payCycleStartDate));
+    } else {
+      // Default to first of current month if not set
+      const firstOfMonth = new Date();
+      firstOfMonth.setDate(1);
+      setPayCycleStartDate(firstOfMonth);
+    }
+    
+    if (userData?.payCycle) {
+      setPayFrequency(userData.payCycle as 'weekly' | 'fortnightly' | 'monthly');
+    }
+  }, [userData]);
 
   // Load from localStorage on mount and refresh when API data changes
   useEffect(() => {
@@ -298,17 +342,17 @@ export default function EnvelopePlanning() {
     }
   }, [planningEnvelopes]);
 
-  // Auto-recalculate when pay frequency changes
+  // Auto-recalculate when pay frequency or pay cycle start date changes
   useEffect(() => {
-    if (planningEnvelopes.length > 0) {
+    if (planningEnvelopes.length > 0 && payCycleStartDate) {
       recalculateAll();
     }
-  }, [payFrequency]);
+  }, [payFrequency, payCycleStartDate]);
 
   const recalculateAll = (envelopes: PlanningEnvelope[] = planningEnvelopes) => {
     const updated = envelopes.map(env => {
       const requiredContribution = calculateRequiredContribution(env.dueAmount, env.dueFrequency, payFrequency);
-      const expected = calculateExpectedBalance({ ...env, contributionAmount: requiredContribution });
+      const expected = calculateExpectedBalance({ ...env, contributionAmount: requiredContribution }, payCycleStartDate, payFrequency);
       const status = getStatus(env.actualBalance, expected);
       return { 
         ...env, 
@@ -641,7 +685,7 @@ export default function EnvelopePlanning() {
 
       <Card>
         <CardContent>
-          <div className="mb-4 mt-6 space-y-2">
+          <div className="mb-4 mt-6 space-y-4">
             <div className="flex items-center gap-4">
               <label className="text-sm font-medium">Pay Frequency:</label>
               <Select value={payFrequency} onValueChange={(value: 'weekly' | 'fortnightly' | 'monthly') => setPayFrequency(value)}>
@@ -655,9 +699,36 @@ export default function EnvelopePlanning() {
                 </SelectContent>
               </Select>
             </div>
-            <p className="text-sm text-gray-600">
-              This determines how the "Required" column calculates amounts from your due amount.
-            </p>
+            
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Pay Cycle Start Date:</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-48 justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {payCycleStartDate ? format(payCycleStartDate, "PPP") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={payCycleStartDate || undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        setPayCycleStartDate(date);
+                        updateUserSettingsMutation.mutate({ payCycleStartDate: date });
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>Pay frequency determines how the 'Required' column calculates amounts from your due amount</div>
+              <div>Pay cycle start date is used to calculate expected balances based on actual payment periods since this date</div>
+            </div>
           </div>
           
           {/* Collapse/Expand All Toggle Control */}
