@@ -76,8 +76,6 @@ export default function Sidebar() {
     { href: "/setup", icon: Play, label: "Getting Started" },
     { href: "/", icon: Home, label: "Reconcile" },
     { href: "/dashboard", icon: Inbox, label: "Dashboard" },
-    { href: "/zero-budget-setup", icon: Target, label: "Budget" },
-    { href: "/envelopes-new", icon: PiggyBank, label: "Envelopes" },
     { href: "/envelope-summary", icon: List, label: "Envelope Summary" },
     { href: "/envelope-planning", icon: BarChart3, label: "Envelope Planning" },
     { href: "/envelope-balances", icon: BarChart3, label: "Balance Report" },

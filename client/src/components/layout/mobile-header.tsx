@@ -85,22 +85,23 @@ export default function MobileHeader() {
   };
 
   const navItems = [
-    { href: "/setup", icon: Play, label: "Getting Started" },
     { href: "/", icon: Home, label: "Reconcile" },
     { href: "/dashboard", icon: Inbox, label: "Dashboard" },
-    { href: "/zero-budget-setup", icon: Target, label: "Budget" },
-    { href: "/envelopes-new", icon: PiggyBank, label: "Envelopes" },
     { href: "/envelope-summary", icon: List, label: "Envelope Summary" },
     { href: "/envelope-planning", icon: BarChart3, label: "Envelope Planning" },
     { href: "/envelope-balances", icon: FileSpreadsheet, label: "Balance Report" },
     { href: "/transactions", icon: List, label: "Transactions" },
-    { href: "/net-worth", icon: BarChart3, label: "Net Worth" },
-    { href: "/debt-management", icon: CreditCard, label: "Debt Management" },
     { href: "/accounts", icon: Wallet, label: "Accounts" },
     { href: "/recurring-income", icon: RotateCcw, label: "Recurring Income" },
-    { href: "/reports", icon: GitBranch, label: "Reports" },
     { href: "/rules", icon: GitBranch, label: "Rules" },
     { href: "/settings", icon: Settings, label: "Settings" },
+  ];
+
+  const comingSoonItems = [
+    { href: "/setup", icon: Play, label: "Getting Started" },
+    { href: "/debt-management", icon: CreditCard, label: "Debt Management" },
+    { href: "/net-worth", icon: BarChart3, label: "Net Worth" },
+    { href: "/reports", icon: GitBranch, label: "Reports" },
   ];
 
   return (
@@ -186,10 +187,18 @@ export default function MobileHeader() {
                       
                       {comingSoonExpanded && (
                         <div className="pl-6 space-y-1">
-                          {/* Placeholder for future submenu items */}
-                          <div className="px-3 py-2 text-xs text-muted-foreground italic">
-                            Submenu items will appear here
-                          </div>
+                          {comingSoonItems.map((item) => (
+                            <Link key={item.href} href={item.href}>
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-start text-muted-foreground"
+                                onClick={() => setIsOpen(false)}
+                              >
+                                <item.icon className="mr-2 h-4 w-4" />
+                                {item.label}
+                              </Button>
+                            </Link>
+                          ))}
                         </div>
                       )}
                     </div>
