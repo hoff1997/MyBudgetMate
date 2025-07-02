@@ -1741,12 +1741,21 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import Supabase storage implementation
+// Import storage implementations
 import { supabaseStorage } from './supabase-storage';
+import { ReplitStorage } from './replit-storage';
 
-// Use Supabase storage if credentials are available, otherwise fall back to memory storage
-export const storage = process.env.SUPABASE_URL && process.env.SUPABASE_KEY 
-  ? supabaseStorage 
-  : new MemStorage();
+// Use Replit Database if available, then Supabase, then fall back to memory storage
+export const storage = process.env.REPLIT_DB_URL
+  ? new ReplitStorage()
+  : process.env.SUPABASE_URL && process.env.SUPABASE_KEY 
+    ? supabaseStorage 
+    : new MemStorage();
 
-console.log('📦 Storage backend:', process.env.SUPABASE_URL ? 'Supabase PostgreSQL' : 'In-Memory (Demo Mode)');
+const storageType = process.env.REPLIT_DB_URL 
+  ? 'Replit Database (Persistent)' 
+  : process.env.SUPABASE_URL 
+    ? 'Supabase PostgreSQL' 
+    : 'In-Memory (Demo Mode)';
+
+console.log('📦 Storage backend:', storageType);

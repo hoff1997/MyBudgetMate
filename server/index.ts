@@ -37,9 +37,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Test Supabase connection on startup
+// Initialize database storage
 async function initializeDatabase() {
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
+  if (process.env.REPLIT_DB_URL) {
+    log('✅ Connected to Replit Database - all data will be persisted');
+    log('🎯 Using Replit\'s built-in key-value storage for persistence');
+  } else if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
     const { testSupabaseConnection } = await import("./supabase");
     const { initializeSupabaseData } = await import("./supabase-init");
     
@@ -52,14 +55,8 @@ async function initializeDatabase() {
       log('⚠️ Supabase connection failed - using in-memory storage (data will be lost on restart)');
     }
   } else {
-    log('⚠️ Supabase credentials not found - using in-memory storage (data will be lost on restart)');
-    log('💡 Add SUPABASE_URL and SUPABASE_KEY to Secrets tab for persistent data storage');
-    
-    // Initialize default envelope types for demo user
-    const { storage } = await import("./storage");
-    if ('initializeDefaultEnvelopeTypes' in storage) {
-      await storage.initializeDefaultEnvelopeTypes(1);
-    }
+    log('⚠️ No persistent storage configured - using in-memory storage (data will be lost on restart)');
+    log('💡 Data will persist on Replit automatically with built-in database');
   }
 }
 
