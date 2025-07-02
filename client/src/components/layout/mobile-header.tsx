@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, Plus, Home, Wallet, Inbox, List, RotateCcw, Scale, BarChart3, GitBranch, Settings, User, HelpCircle, Play, UserCircle, FileSpreadsheet, ExternalLink, Receipt, FolderPlus, CreditCard, PiggyBank, ArrowLeftRight, Target, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,7 @@ import { EnhancedTransactionDialog } from "@/components/enhanced-transaction-dia
 export default function MobileHeader() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const { logout } = useAuth();
+  const { user } = useAuth();
 
   const getQuickActions = () => {
     const commonActions = [
@@ -195,7 +195,7 @@ export default function MobileHeader() {
                         className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
                         onClick={() => {
                           setIsOpen(false);
-                          logout();
+                          window.location.href = "/api/logout";
                         }}
                       >
                         <LogOut className="mr-2 h-4 w-4" />

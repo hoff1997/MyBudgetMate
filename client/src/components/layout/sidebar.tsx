@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { EnhancedTransactionDialog } from "@/components/enhanced-transaction-dialog";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Home, 
   Inbox, 
@@ -28,7 +28,7 @@ import {
 
 export default function Sidebar() {
   const [location] = useLocation();
-  const { logout } = useAuth();
+  const { user } = useAuth();
 
   const getQuickActions = () => {
     const commonActions = [
@@ -186,7 +186,7 @@ export default function Sidebar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={logout}
+              onClick={() => window.location.href = "/api/logout"}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4" />
