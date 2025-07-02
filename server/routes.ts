@@ -60,6 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get all envelopes
   app.get('/api/envelopes', async (req, res) => {
+    // For now, use demo user ID 1 until auth is working
     const envelopes = await storage.getEnvelopesByUserId(1);
     res.json(envelopes);
   });

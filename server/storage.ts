@@ -22,7 +22,7 @@ import {
 export interface IStorage {
   // Users
   getAllUsers(): Promise<User[]>;
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: string | number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<void>;
@@ -1007,8 +1007,14 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values());
   }
 
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUser(id: string | number): Promise<User | undefined> {
+    if (typeof id === 'string') {
+      // Search by Replit ID
+      return Array.from(this.users.values()).find(u => u.replitId === id);
+    } else {
+      // Search by internal numeric ID
+      return this.users.get(id);
+    }
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
