@@ -261,6 +261,148 @@ export class MemStorage implements IStorage {
     });
   }
 
+  private async initializeNewUserBudget(userId: number): Promise<void> {
+    // Create default envelope categories for new user
+    const defaultCategories = [
+      { name: "Income", icon: "💼", color: "bg-emerald-100 text-emerald-800", sortOrder: 1 },
+      { name: "Essential Expenses", icon: "🏠", color: "bg-blue-100 text-blue-800", sortOrder: 2 },
+      { name: "Transportation & Travel", icon: "🚗", color: "bg-orange-100 text-orange-800", sortOrder: 3 },
+      { name: "Lifestyle & Discretionary", icon: "🎭", color: "bg-purple-100 text-purple-800", sortOrder: 4 },
+      { name: "Personal Care & Health", icon: "💊", color: "bg-green-100 text-green-800", sortOrder: 5 },
+      { name: "Utilities & Services", icon: "⚡", color: "bg-yellow-100 text-yellow-800", sortOrder: 6 },
+      { name: "Savings & Investments", icon: "💰", color: "bg-teal-100 text-teal-800", sortOrder: 7 }
+    ];
+
+    const categoryMap: Map<string, number> = new Map();
+    
+    for (const categoryData of defaultCategories) {
+      const categoryId = ++this.currentId;
+      const category: EnvelopeCategory = {
+        id: categoryId,
+        userId,
+        name: categoryData.name,
+        icon: categoryData.icon,
+        color: categoryData.color,
+        sortOrder: categoryData.sortOrder,
+        isActive: true,
+        isDefault: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.envelopeCategories.set(categoryId, category);
+      categoryMap.set(categoryData.name, categoryId);
+    }
+
+    // Create default accounts for new user
+    const defaultAccount: Account = {
+      id: ++this.currentId,
+      userId,
+      name: "Main Account",
+      type: "bank",
+      balance: "0.00",
+      isActive: true
+    };
+    this.accounts.set(defaultAccount.id, defaultAccount);
+
+    // Create comprehensive default envelopes
+    const defaultEnvelopes = [
+      // Income
+      { name: "Salary", category: "Income", icon: "💼", budget: "0.00", type: "Income" },
+      { name: "Other Income", category: "Income", icon: "💰", budget: "0.00", type: "Income" },
+      
+      // Essential Expenses
+      { name: "Rent/Mortgage", category: "Essential Expenses", icon: "🏠", budget: "0.00", type: "Expense" },
+      { name: "Groceries", category: "Essential Expenses", icon: "🛒", budget: "200.00", type: "Expense", monitored: true },
+      { name: "Power", category: "Essential Expenses", icon: "⚡", budget: "80.00", type: "Expense" },
+      { name: "Water", category: "Essential Expenses", icon: "💧", budget: "40.00", type: "Expense" },
+      { name: "Internet", category: "Essential Expenses", icon: "🌐", budget: "60.00", type: "Expense" },
+      { name: "Phone", category: "Essential Expenses", icon: "📱", budget: "50.00", type: "Expense" },
+      { name: "Insurance", category: "Essential Expenses", icon: "🛡️", budget: "100.00", type: "Expense" },
+      
+      // Transportation & Travel
+      { name: "Petrol", category: "Transportation & Travel", icon: "⛽", budget: "120.00", type: "Expense" },
+      { name: "Public Transport", category: "Transportation & Travel", icon: "🚌", budget: "40.00", type: "Expense" },
+      { name: "Vehicle Maintenance", category: "Transportation & Travel", icon: "🔧", budget: "80.00", type: "Expense" },
+      { name: "Registration & WOF", category: "Transportation & Travel", icon: "📋", budget: "30.00", type: "Expense" },
+      { name: "Travel", category: "Transportation & Travel", icon: "✈️", budget: "50.00", type: "Expense" },
+      
+      // Lifestyle & Discretionary
+      { name: "Dining Out", category: "Lifestyle & Discretionary", icon: "🍽️", budget: "80.00", type: "Expense" },
+      { name: "Entertainment", category: "Lifestyle & Discretionary", icon: "🎬", budget: "60.00", type: "Expense" },
+      { name: "Hobbies", category: "Lifestyle & Discretionary", icon: "🎨", budget: "50.00", type: "Expense" },
+      { name: "Subscriptions", category: "Lifestyle & Discretionary", icon: "📺", budget: "40.00", type: "Expense" },
+      { name: "Clothing", category: "Lifestyle & Discretionary", icon: "👕", budget: "60.00", type: "Expense" },
+      { name: "Gifts", category: "Lifestyle & Discretionary", icon: "🎁", budget: "40.00", type: "Expense" },
+      { name: "Personal Spending", category: "Lifestyle & Discretionary", icon: "💳", budget: "100.00", type: "Expense", monitored: true },
+      
+      // Personal Care & Health
+      { name: "Medical", category: "Personal Care & Health", icon: "🏥", budget: "60.00", type: "Expense" },
+      { name: "Dental", category: "Personal Care & Health", icon: "🦷", budget: "40.00", type: "Expense" },
+      { name: "Pharmacy", category: "Personal Care & Health", icon: "💊", budget: "30.00", type: "Expense" },
+      { name: "Personal Care", category: "Personal Care & Health", icon: "🧴", budget: "40.00", type: "Expense" },
+      { name: "Gym/Fitness", category: "Personal Care & Health", icon: "💪", budget: "60.00", type: "Expense" },
+      
+      // Utilities & Services
+      { name: "Banking Fees", category: "Utilities & Services", icon: "🏦", budget: "20.00", type: "Expense" },
+      { name: "Professional Services", category: "Utilities & Services", icon: "⚖️", budget: "50.00", type: "Expense" },
+      { name: "Home Maintenance", category: "Utilities & Services", icon: "🔨", budget: "80.00", type: "Expense" },
+      { name: "Technology", category: "Utilities & Services", icon: "💻", budget: "40.00", type: "Expense" },
+      
+      // Savings & Investments
+      { name: "Emergency Fund", category: "Savings & Investments", icon: "🚨", budget: "100.00", type: "Expense" },
+      { name: "Retirement Savings", category: "Savings & Investments", icon: "👴", budget: "150.00", type: "Expense" },
+      { name: "Holiday Fund", category: "Savings & Investments", icon: "🏖️", budget: "80.00", type: "Expense" },
+      { name: "Investment Fund", category: "Savings & Investments", icon: "📈", budget: "100.00", type: "Expense" },
+      { name: "House Deposit", category: "Savings & Investments", icon: "🏡", budget: "200.00", type: "Expense" }
+    ];
+
+    for (const envelopeData of defaultEnvelopes) {
+      const envelopeId = ++this.currentId;
+      const envelope: Envelope = {
+        id: envelopeId,
+        userId,
+        name: envelopeData.name,
+        icon: envelopeData.icon,
+        budget: envelopeData.budget,
+        balance: "0.00",
+        sortOrder: 0,
+        categoryId: categoryMap.get(envelopeData.category) || null,
+        envelopeType: envelopeData.type as "Income" | "Expense",
+        frequency: "monthly",
+        openingBalance: "0.00",
+        currentBalance: "0.00",
+        isMonitored: envelopeData.monitored || false,
+        isSpendingAccount: false,
+        nextDueDate: null,
+        dueAmount: null,
+        notes: null
+      };
+      this.envelopes.set(envelopeId, envelope);
+    }
+
+    // Create default labels for new user
+    const defaultLabels = [
+      { name: "Personal", colour: "#3b82f6" },
+      { name: "Business", colour: "#10b981" },
+      { name: "Urgent", colour: "#ef4444" },
+      { name: "Subscription", colour: "#8b5cf6" },
+      { name: "One-time", colour: "#f59e0b" }
+    ];
+
+    for (const labelData of defaultLabels) {
+      const labelId = ++this.currentId;
+      const label: Label = {
+        id: labelId,
+        userId,
+        name: labelData.name,
+        colour: labelData.colour
+      };
+      this.labels.set(labelId, label);
+    }
+
+    console.log(`✅ Initialized complete default budget for new user ${userId} with ${defaultEnvelopes.length} envelopes, ${defaultCategories.length} categories, and ${defaultLabels.length} labels`);
+  }
+
   private initializeSampleData() {
     // Create demo user
     const demoUser: User = { id: 1, username: "demo", password: "demo", payCycle: "fortnightly", budgetName: "Hoffman Household Budget" };
@@ -1074,6 +1216,10 @@ export class MemStorage implements IStorage {
         emailVerified: false,
       };
       this.users.set(id, newUser);
+      
+      // Initialize new user with default budget setup
+      await this.initializeNewUserBudget(id);
+      
       return newUser;
     }
   }
