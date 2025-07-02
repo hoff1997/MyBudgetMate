@@ -364,10 +364,49 @@ export class ReplitStorage implements IStorage {
   async createCategoryRule(data: any): Promise<any> { throw new Error('Not implemented in Replit Storage'); }
   async deleteCategoryRule(id: number): Promise<void> { }
 
-  async getEnvelopeCategoriesByUserId(userId: number): Promise<any[]> { return []; }
-  async createEnvelopeCategory(data: any): Promise<any> { throw new Error('Not implemented in Replit Storage'); }
-  async updateEnvelopeCategory(id: number, data: any): Promise<any> { throw new Error('Not implemented in Replit Storage'); }
-  async deleteEnvelopeCategory(id: number): Promise<void> { }
+  async getEnvelopeCategoriesByUserId(userId: number): Promise<any[]> {
+    const keys = await this.db.list('envelope_category:');
+    const categories = [];
+    for (const key of keys) {
+      const category = await this.db.get(key);
+      if (category && category.userId === userId) {
+        categories.push(category);
+      }
+    }
+    return categories.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  }
+  
+  async createEnvelopeCategory(data: any): Promise<any> {
+    const id = await this.getNextId();
+    const category = {
+      id,
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      isCollapsed: data.isCollapsed !== undefined ? data.isCollapsed : false,
+      sortOrder: data.sortOrder !== undefined ? data.sortOrder : 0
+    };
+    await this.db.set(`envelope_category:${id}`, category);
+    return category;
+  }
+  
+  async updateEnvelopeCategory(id: number, data: any): Promise<any> {
+    const category = await this.db.get(`envelope_category:${id}`);
+    if (!category) throw new Error('Category not found');
+    
+    const updated = {
+      ...category,
+      ...data,
+      updatedAt: new Date()
+    };
+    await this.db.set(`envelope_category:${id}`, updated);
+    return updated;
+  }
+  
+  async deleteEnvelopeCategory(id: number): Promise<void> {
+    await this.db.delete(`envelope_category:${id}`);
+  }
 
   async getLabelsByUserId(userId: number): Promise<any[]> { return []; }
   async createLabel(data: any): Promise<any> { throw new Error('Not implemented in Replit Storage'); }
