@@ -59,20 +59,38 @@ export class SupabaseStorage implements IStorage {
     return data as User[];
   }
   
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string | number): Promise<User | undefined> {
     const client = checkSupabase();
-    const { data, error } = await client
-      .from('users')
-      .select('*')
-      .eq('id', id)
-      .single();
     
-    if (error) {
-      console.error('Error fetching user:', error);
-      return undefined;
+    if (typeof id === 'string') {
+      // Search by Replit ID
+      const { data, error } = await client
+        .from('users')
+        .select('*')
+        .eq('replit_id', id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user by replit_id:', error);
+        return undefined;
+      }
+      
+      return data as User;
+    } else {
+      // Search by internal numeric ID
+      const { data, error } = await client
+        .from('users')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user by id:', error);
+        return undefined;
+      }
+      
+      return data as User;
     }
-    
-    return data as User;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -115,6 +133,65 @@ export class SupabaseStorage implements IStorage {
     if (error) {
       console.error('Error updating user:', error);
       throw new Error(`Failed to update user: ${error.message}`);
+    }
+  }
+
+  async upsertUser(userData: { id: string; email?: string; firstName?: string; lastName?: string; profileImageUrl?: string }): Promise<User> {
+    const client = checkSupabase();
+    
+    // First, try to find existing user by replit_id
+    const { data: existingUser, error: fetchError } = await client
+      .from('users')
+      .select('*')
+      .eq('replit_id', userData.id)
+      .single();
+    
+    if (existingUser && !fetchError) {
+      // Update existing user
+      const { data, error } = await client
+        .from('users')
+        .update({
+          email: userData.email || existingUser.email,
+          first_name: userData.firstName || existingUser.firstName,
+          last_name: userData.lastName || existingUser.lastName,
+          profile_image_url: userData.profileImageUrl || existingUser.profileImageUrl,
+          updated_at: new Date(),
+        })
+        .eq('replit_id', userData.id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating user:', error);
+        throw new Error(`Failed to update user: ${error.message}`);
+      }
+      
+      return data as User;
+    } else {
+      // Create new user
+      const { data, error } = await client
+        .from('users')
+        .insert({
+          replit_id: userData.id,
+          email: userData.email || null,
+          first_name: userData.firstName || null,
+          last_name: userData.lastName || null,
+          profile_image_url: userData.profileImageUrl || null,
+          budget_name: null,
+          pay_cycle: "fortnightly",
+          username: `user_${userData.id}`, // Generate a username from Replit ID
+          created_at: new Date(),
+          updated_at: new Date(),
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating user:', error);
+        throw new Error(`Failed to create user: ${error.message}`);
+      }
+      
+      return data as User;
     }
   }
 

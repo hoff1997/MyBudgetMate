@@ -59,9 +59,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all envelopes
-  app.get('/api/envelopes', async (req, res) => {
-    // For now, use demo user ID 1 until auth is working
-    const envelopes = await storage.getEnvelopesByUserId(1);
+  app.get('/api/envelopes', isAuthenticated, async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const user = await storage.getUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const envelopes = await storage.getEnvelopesByUserId(user.id);
     res.json(envelopes);
   });
 
