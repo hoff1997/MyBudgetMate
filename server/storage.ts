@@ -1,5 +1,5 @@
 import { 
-  users, accounts, envelopes, envelopeCategories, transactions, transactionEnvelopes, categoryRules, merchantMemory, bankConnections, recurringTransactions, recurringTransactionSplits,
+  users, accounts, envelopes, envelopeCategories, transactions, transactionEnvelopes, categoryRules, merchantMemory, bankConnections, recurringTransactions, recurringTransactionSplits, assets, liabilities, netWorthSnapshots, labels, transactionLabels, envelopeTypes,
   type User, type InsertUser,
   type Account, type InsertAccount,
   type Envelope, type InsertEnvelope,
@@ -10,16 +10,23 @@ import {
   type MerchantMemory, type InsertMerchantMemory,
   type BankConnection, type InsertBankConnection,
   type RecurringTransaction, type InsertRecurringTransaction,
-  type RecurringTransactionSplit, type InsertRecurringTransactionSplit
+  type RecurringTransactionSplit, type InsertRecurringTransactionSplit,
+  type Asset, type InsertAsset,
+  type Liability, type InsertLiability,
+  type NetWorthSnapshot, type InsertNetWorthSnapshot,
+  type Label, type InsertLabel,
+  type TransactionLabel,
+  type EnvelopeType, type InsertEnvelopeType
 } from "@shared/schema";
 
 export interface IStorage {
   // Users
   getAllUsers(): Promise<User[]>;
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<void>;
+  upsertUser(user: { id: string; email?: string; firstName?: string; lastName?: string; profileImageUrl?: string }): Promise<User>;
 
   // Accounts
   getAccountsByUserId(userId: number): Promise<Account[]>;
@@ -1019,6 +1026,49 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (user) {
       this.users.set(id, { ...user, ...updates });
+    }
+  }
+
+  async upsertUser(userData: { id: string; email?: string; firstName?: string; lastName?: string; profileImageUrl?: string }): Promise<User> {
+    // Find existing user by Replit ID (stored as string in userData.id)
+    const existingUser = Array.from(this.users.values()).find(u => u.replitId === userData.id);
+    
+    if (existingUser) {
+      // Update existing user
+      const updatedUser = {
+        ...existingUser,
+        email: userData.email || existingUser.email,
+        firstName: userData.firstName || existingUser.firstName,
+        lastName: userData.lastName || existingUser.lastName,
+        profileImageUrl: userData.profileImageUrl || existingUser.profileImageUrl,
+        updatedAt: new Date(),
+      };
+      this.users.set(existingUser.id, updatedUser);
+      return updatedUser;
+    } else {
+      // Create new user
+      const id = this.currentId++;
+      const newUser: User = {
+        id,
+        username: userData.email || `user_${userData.id}`,
+        email: userData.email || null,
+        firstName: userData.firstName || null,
+        lastName: userData.lastName || null,
+        profileImageUrl: userData.profileImageUrl || null,
+        replitId: userData.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        password: null, // Replit Auth doesn't use passwords
+        budgetName: "My Budget",
+        payCycle: "fortnightly",
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        backupCodes: null,
+        phoneNumber: null,
+        emailVerified: false,
+      };
+      this.users.set(id, newUser);
+      return newUser;
     }
   }
 

@@ -6,10 +6,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import express from "express";
-import session from "express-session";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import bcrypt from "bcrypt";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 // Configure multer for file uploads
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -46,35 +43,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files
   app.use('/uploads', express.static(uploadsDir));
 
-  // Authentication endpoint
-  app.post('/api/auth/login', async (req, res) => {
-    const { password } = req.body;
-    const masterPassword = process.env.MASTER_PASSWORD || 'budget123';
-    
-    if (password === masterPassword) {
-      res.json({ success: true });
-    } else {
-      res.status(401).json({ error: 'Invalid password' });
-    }
-  });
+  // Setup Replit Auth
+  await setupAuth(app);
 
-  // Change password endpoint
-  app.post('/api/auth/change-password', async (req, res) => {
-    const { currentPassword, newPassword } = req.body;
-    const masterPassword = process.env.MASTER_PASSWORD || 'budget123';
-    
-    // Verify current password
-    if (currentPassword !== masterPassword) {
-      return res.status(401).json({ error: 'Current password is incorrect' });
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
-
-    // In a production environment, you would update the environment variable
-    // For now, we'll simulate success but note that the password won't persist
-    // unless MASTER_PASSWORD is updated in the environment
-    res.json({ 
-      success: true,
-      message: 'Password updated successfully. Note: To persist this change, update the MASTER_PASSWORD environment variable in your deployment settings.' 
-    });
   });
 
   // Get all envelopes

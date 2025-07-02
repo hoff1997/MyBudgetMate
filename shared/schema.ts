@@ -5,7 +5,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"), // nullable for Replit Auth users
   payCycle: text("pay_cycle").default("fortnightly"),
   budgetName: text("budget_name").default("Personal Budget"),
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
@@ -14,6 +14,12 @@ export const users = pgTable("users", {
   phoneNumber: text("phone_number"), // for SMS 2FA
   emailVerified: boolean("email_verified").default(false),
   email: text("email"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  profileImageUrl: text("profile_image_url"),
+  replitId: text("replit_id").unique(), // Replit user ID
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const accounts = pgTable("accounts", {
