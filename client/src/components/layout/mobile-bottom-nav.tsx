@@ -8,7 +8,6 @@ export default function MobileBottomNav() {
   const navigationItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard" },
     { href: "/", icon: Scale, label: "Reconcile" },
-    { href: "/transactions", icon: Receipt, label: "Transactions" },
   ];
 
   return (

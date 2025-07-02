@@ -85,23 +85,23 @@ export default function MobileHeader() {
   };
 
   const navItems = [
-    { href: "/", icon: Home, label: "Reconcile" },
-    { href: "/dashboard", icon: Inbox, label: "Dashboard" },
-    { href: "/envelope-summary", icon: List, label: "Envelope Summary" },
-    { href: "/envelope-planning", icon: BarChart3, label: "Envelope Planning" },
-    { href: "/envelope-balances", icon: FileSpreadsheet, label: "Balance Report" },
-    { href: "/transactions", icon: List, label: "Transactions" },
-    { href: "/accounts", icon: Wallet, label: "Accounts" },
-    { href: "/recurring-income", icon: RotateCcw, label: "Recurring Income" },
-    { href: "/rules", icon: GitBranch, label: "Rules" },
+    { href: "/dashboard", icon: Home, label: "Dashboard" },
+    { href: "/", icon: Scale, label: "Reconcile" },
     { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
   const comingSoonItems = [
     { href: "/setup", icon: Play, label: "Getting Started" },
+    { href: "/envelope-summary", icon: List, label: "Envelope Summary" },
+    { href: "/envelope-planning", icon: BarChart3, label: "Envelope Planning" },
+    { href: "/envelope-balances", icon: FileSpreadsheet, label: "Balance Report" },
+    { href: "/transactions", icon: Receipt, label: "Transactions" },
+    { href: "/accounts", icon: Wallet, label: "Accounts" },
+    { href: "/recurring-income", icon: RotateCcw, label: "Recurring Income" },
     { href: "/debt-management", icon: CreditCard, label: "Debt Management" },
     { href: "/net-worth", icon: BarChart3, label: "Net Worth" },
     { href: "/reports", icon: GitBranch, label: "Reports" },
+    { href: "/rules", icon: GitBranch, label: "Rules" },
   ];
 
   return (
