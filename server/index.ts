@@ -136,39 +136,7 @@ async function initializeReplitDemoData(storage: any) {
 
     console.log('👤 Created demo user');
 
-    // Create demo accounts
-    const accounts = [
-      {
-        userId: 1,
-        name: 'ASB Everyday Account',
-        type: 'checking',
-        balance: '2847.63'
-      },
-      {
-        userId: 1,
-        name: 'ANZ Savings Account',
-        type: 'savings',
-        balance: '15420.50'
-      },
-      {
-        userId: 1,
-        name: 'Westpac Credit Card',
-        type: 'credit',
-        balance: '-1250.30'
-      },
-      {
-        userId: 1,
-        name: 'Credit Card Holding',
-        type: 'checking',
-        balance: '1250.30'
-      }
-    ];
-
-    for (const account of accounts) {
-      await storage.createAccount(account);
-    }
-
-    console.log('🏦 Created demo accounts');
+    // Skip account creation - user will create their own accounts
 
     // Create envelope categories
     const categories = [
@@ -250,34 +218,6 @@ async function initializeReplitDemoData(storage: any) {
     }
 
     console.log('💰 Created demo envelopes');
-
-    // Create demo transactions
-    const transactions = [
-      {
-        userId: 1,
-        accountId: 1,
-        amount: '-45.67',
-        merchant: 'Countdown',
-        description: 'Weekly groceries',
-        date: new Date('2025-01-01'),
-        isApproved: true
-      },
-      {
-        userId: 1,
-        accountId: 1,
-        amount: '-12.50',
-        merchant: 'Coffee Supreme',
-        description: 'Morning coffee',
-        date: new Date('2025-01-02'),
-        isApproved: false
-      }
-    ];
-
-    for (const transaction of transactions) {
-      await storage.createTransaction(transaction);
-    }
-
-    console.log('💳 Created demo transactions');
     console.log('✅ Demo data initialization complete!');
 
   } catch (error) {
