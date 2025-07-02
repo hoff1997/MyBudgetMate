@@ -46,8 +46,19 @@ async function initializeDatabase() {
     // Initialize demo data if database is empty
     const { storage } = await import("./storage");
     const existingUsers = await storage.getAllUsers();
-    if (existingUsers.length === 0) {
-      log('🎯 Initializing demo data for new Replit Database...');
+    
+    // Force comprehensive demo data initialization for existing deployment
+    let envelopeCount = 0;
+    try {
+      const envelopes = await storage.getEnvelopesByUserId(1);
+      envelopeCount = envelopes.length;
+    } catch (error) {
+      // User might not exist yet
+      envelopeCount = 0;
+    }
+    
+    if (existingUsers.length === 0 || envelopeCount < 30) {
+      log('🎯 Initializing comprehensive demo data for Replit Database...');
       await initializeReplitDemoData(storage);
     }
   } else if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
@@ -178,56 +189,60 @@ async function initializeReplitDemoData(storage: any) {
 
     console.log('📂 Created envelope categories');
 
-    // Create demo envelopes
+    // Create comprehensive demo envelopes
     const envelopes = [
-      {
-        userId: 1,
-        categoryId: createdCategories[0].id, // Income
-        name: "Greg's Salary",
-        budgetedAmount: '3200.00',
-        currentBalance: '0.00',
-        budgetFrequency: 'fortnightly',
-        envelopeType: 'income',
-        isMonitored: false
-      },
-      {
-        userId: 1,
-        categoryId: createdCategories[2].id, // Lifestyle
-        name: 'Groceries',
-        budgetedAmount: '400.00',
-        currentBalance: '127.35',
-        budgetFrequency: 'monthly',
-        envelopeType: 'expense',
-        isMonitored: true
-      },
-      {
-        userId: 1,
-        categoryId: createdCategories[2].id, // Lifestyle
-        name: 'Spending Deb',
-        budgetedAmount: '200.00',
-        currentBalance: '89.20',
-        budgetFrequency: 'fortnightly',
-        envelopeType: 'expense',
-        isMonitored: true
-      },
-      {
-        userId: 1,
-        categoryId: createdCategories[1].id, // Essential
-        name: 'Rent',
-        budgetedAmount: '1800.00',
-        currentBalance: '1800.00',
-        budgetFrequency: 'monthly',
-        envelopeType: 'expense'
-      },
-      {
-        userId: 1,
-        categoryId: createdCategories[4].id, // Transportation
-        name: 'Fuel',
-        budgetedAmount: '120.00',
-        currentBalance: '45.75',
-        budgetFrequency: 'monthly',
-        envelopeType: 'expense'
-      }
+      // Income category
+      { userId: 1, categoryId: createdCategories[0].id, name: "Greg's Salary", budgetedAmount: "3200.00", currentBalance: "0.00", budgetFrequency: "fortnightly", envelopeType: "income", icon: "💼", isMonitored: false },
+      { userId: 1, categoryId: createdCategories[0].id, name: "Deb's Salary", budgetedAmount: "2800.00", currentBalance: "0.00", budgetFrequency: "fortnightly", envelopeType: "income", icon: "💼" },
+      { userId: 1, categoryId: createdCategories[0].id, name: "Greg's Bonus", budgetedAmount: "3000.00", currentBalance: "200.00", budgetFrequency: "annually", envelopeType: "income", icon: "🎁" },
+      { userId: 1, categoryId: createdCategories[0].id, name: "Other Income", budgetedAmount: "1200.00", currentBalance: "0.00", budgetFrequency: "monthly", envelopeType: "income", icon: "💰" },
+      { userId: 1, categoryId: createdCategories[0].id, name: "Investment Returns", budgetedAmount: "1800.00", currentBalance: "150.00", budgetFrequency: "monthly", envelopeType: "income", icon: "📊" },
+      
+      // Essential Expenses
+      { userId: 1, categoryId: createdCategories[1].id, name: "Rent/Mortgage", budgetedAmount: "1800.00", currentBalance: "1800.00", budgetFrequency: "monthly", envelopeType: "expense", icon: "🏠" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "Groceries", budgetedAmount: "400.00", currentBalance: "127.35", budgetFrequency: "monthly", envelopeType: "expense", isMonitored: true, icon: "🛒" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "Power", budgetedAmount: "180.00", currentBalance: "80.00", budgetFrequency: "monthly", envelopeType: "expense", icon: "⚡" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "Water", budgetedAmount: "120.00", currentBalance: "40.00", budgetFrequency: "quarterly", envelopeType: "expense", icon: "💧" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "Internet", budgetedAmount: "780.00", currentBalance: "60.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🌐" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "Phone", budgetedAmount: "600.00", currentBalance: "50.00", budgetFrequency: "annually", envelopeType: "expense", icon: "📱" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "House Insurance", budgetedAmount: "2400.00", currentBalance: "100.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🛡️" },
+      { userId: 1, categoryId: createdCategories[1].id, name: "Council Rates", budgetedAmount: "3600.00", currentBalance: "0.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🏛️" },
+      
+      // Lifestyle & Discretionary
+      { userId: 1, categoryId: createdCategories[2].id, name: "Entertainment", budgetedAmount: "100.00", currentBalance: "75.50", budgetFrequency: "monthly", envelopeType: "expense", icon: "🎬" },
+      { userId: 1, categoryId: createdCategories[2].id, name: "Dining Out", budgetedAmount: "150.00", currentBalance: "92.30", budgetFrequency: "monthly", envelopeType: "expense", icon: "🍽️" },
+      { userId: 1, categoryId: createdCategories[2].id, name: "Hobbies", budgetedAmount: "80.00", currentBalance: "45.20", budgetFrequency: "monthly", envelopeType: "expense", icon: "🎨" },
+      { userId: 1, categoryId: createdCategories[2].id, name: "Spending Deb", budgetedAmount: "200.00", currentBalance: "89.20", budgetFrequency: "fortnightly", envelopeType: "expense", isMonitored: true, icon: "💳" },
+      { userId: 1, categoryId: createdCategories[2].id, name: "Clothing", budgetedAmount: "900.00", currentBalance: "75.00", budgetFrequency: "annually", envelopeType: "expense", icon: "👕" },
+      { userId: 1, categoryId: createdCategories[2].id, name: "Gifts", budgetedAmount: "1200.00", currentBalance: "100.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🎁" },
+      { userId: 1, categoryId: createdCategories[2].id, name: "Coffee/Takeaways", budgetedAmount: "120.00", currentBalance: "89.50", budgetFrequency: "monthly", envelopeType: "expense", icon: "☕" },
+      
+      // Personal Care & Health
+      { userId: 1, categoryId: createdCategories[3].id, name: "Healthcare", budgetedAmount: "1440.00", currentBalance: "120.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🏥" },
+      { userId: 1, categoryId: createdCategories[3].id, name: "Dental", budgetedAmount: "720.00", currentBalance: "60.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🦷" },
+      { userId: 1, categoryId: createdCategories[3].id, name: "Personal Care", budgetedAmount: "50.00", currentBalance: "32.75", budgetFrequency: "monthly", envelopeType: "expense", icon: "💄" },
+      { userId: 1, categoryId: createdCategories[3].id, name: "Gym/Fitness", budgetedAmount: "780.00", currentBalance: "65.00", budgetFrequency: "annually", envelopeType: "expense", icon: "💪" },
+      { userId: 1, categoryId: createdCategories[3].id, name: "Supplements", budgetedAmount: "360.00", currentBalance: "30.00", budgetFrequency: "annually", envelopeType: "expense", icon: "💊" },
+      
+      // Transportation & Travel
+      { userId: 1, categoryId: createdCategories[4].id, name: "Petrol", budgetedAmount: "120.00", currentBalance: "45.75", budgetFrequency: "monthly", envelopeType: "expense", icon: "⛽" },
+      { userId: 1, categoryId: createdCategories[4].id, name: "Vehicle Maintenance", budgetedAmount: "1020.00", currentBalance: "85.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🔧" },
+      { userId: 1, categoryId: createdCategories[4].id, name: "Vehicle Insurance", budgetedAmount: "1200.00", currentBalance: "100.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🚗" },
+      { userId: 1, categoryId: createdCategories[4].id, name: "Registration & WOF", budgetedAmount: "300.00", currentBalance: "25.00", budgetFrequency: "annually", envelopeType: "expense", icon: "📋" },
+      { userId: 1, categoryId: createdCategories[4].id, name: "Travel/Holidays", budgetedAmount: "2400.00", currentBalance: "200.00", budgetFrequency: "annually", envelopeType: "expense", icon: "✈️" },
+      
+      // Utilities & Services
+      { userId: 1, categoryId: createdCategories[5].id, name: "Banking Fees", budgetedAmount: "180.00", currentBalance: "15.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🏦" },
+      { userId: 1, categoryId: createdCategories[5].id, name: "Subscriptions", budgetedAmount: "540.00", currentBalance: "35.99", budgetFrequency: "annually", envelopeType: "expense", icon: "📺" },
+      { userId: 1, categoryId: createdCategories[5].id, name: "Software/Apps", budgetedAmount: "360.00", currentBalance: "19.99", budgetFrequency: "annually", envelopeType: "expense", icon: "💻" },
+      { userId: 1, categoryId: createdCategories[5].id, name: "Professional Services", budgetedAmount: "600.00", currentBalance: "0.00", budgetFrequency: "annually", envelopeType: "expense", icon: "👔" },
+      
+      // Savings & Investments
+      { userId: 1, categoryId: createdCategories[6].id, name: "Emergency Fund", budgetedAmount: "300.00", currentBalance: "1250.00", budgetFrequency: "monthly", envelopeType: "expense", icon: "🆘" },
+      { userId: 1, categoryId: createdCategories[6].id, name: "House Deposit", budgetedAmount: "6000.00", currentBalance: "8500.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🏠" },
+      { userId: 1, categoryId: createdCategories[6].id, name: "KiwiSaver", budgetedAmount: "1800.00", currentBalance: "150.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🥝" },
+      { userId: 1, categoryId: createdCategories[6].id, name: "Investments", budgetedAmount: "2400.00", currentBalance: "200.00", budgetFrequency: "annually", envelopeType: "expense", icon: "📈" },
+      { userId: 1, categoryId: createdCategories[6].id, name: "Holiday Fund", budgetedAmount: "1200.00", currentBalance: "450.00", budgetFrequency: "annually", envelopeType: "expense", icon: "🏖️" }
     ];
 
     for (const envelope of envelopes) {
