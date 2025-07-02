@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, Plus, Home, Wallet, Inbox, List, RotateCcw, Scale, BarChart3, GitBranch, Settings, User, HelpCircle, Play, UserCircle, FileSpreadsheet, ExternalLink, Receipt, FolderPlus, CreditCard, PiggyBank, ArrowLeftRight, Target, LogOut } from "lucide-react";
+import { Menu, Plus, Home, Wallet, Inbox, List, RotateCcw, Scale, BarChart3, GitBranch, Settings, User, HelpCircle, Play, UserCircle, FileSpreadsheet, ExternalLink, Receipt, FolderPlus, CreditCard, PiggyBank, ArrowLeftRight, Target, LogOut, Clock, ChevronDown, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -12,6 +12,7 @@ import { EnhancedTransactionDialog } from "@/components/enhanced-transaction-dia
 export default function MobileHeader() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [comingSoonExpanded, setComingSoonExpanded] = useState(false);
   const { user } = useAuth();
 
   const getQuickActions = () => {
@@ -164,6 +165,33 @@ export default function MobileHeader() {
                           </Link>
                         )
                       ))}
+                    </div>
+
+                    <Separator className="my-4" />
+
+                    {/* Coming Soon Submenu */}
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => setComingSoonExpanded(!comingSoonExpanded)}
+                        className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span className="flex-1 text-left">Coming Soon</span>
+                        {comingSoonExpanded ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                      </button>
+                      
+                      {comingSoonExpanded && (
+                        <div className="pl-6 space-y-1">
+                          {/* Placeholder for future submenu items */}
+                          <div className="px-3 py-2 text-xs text-muted-foreground italic">
+                            Submenu items will appear here
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <Separator className="my-4" />
