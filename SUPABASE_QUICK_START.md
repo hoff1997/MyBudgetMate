@@ -1,58 +1,49 @@
-# Quick Start: Connect to Supabase Database
+# Supabase Setup for My Budget Mate
 
-Your budgeting app is ready to connect to Supabase for permanent data storage. Follow these steps:
+## Quick Setup Guide
 
-## 1. Create Supabase Project (2 minutes)
+### 1. Create Supabase Account
+1. Go to [supabase.com](https://supabase.com)
+2. Click "Start your project" 
+3. Sign up with GitHub, Google, or email
 
-1. Go to [supabase.com](https://supabase.com) and sign up
-2. Click "New Project"
-3. Name: "My Budget Mate" 
-4. Set a database password (save it!)
-5. Click "Create new project"
+### 2. Create New Project
+1. Click "New Project"
+2. Choose your organization (or create one)
+3. Enter project details:
+   - **Name**: My Budget Mate (or any name you prefer)
+   - **Database Password**: Create a strong password (save this!)
+   - **Region**: Choose closest to you
+4. Click "Create new project"
+5. Wait 2-3 minutes for setup to complete
 
-## 2. Set Up Database Tables (1 minute)
-
-1. In Supabase dashboard, go to **SQL Editor**
-2. Click "New Query"
-3. Copy ALL contents from `server/supabase-schema.sql`
-4. Paste and click "Run"
-
-## 3. Get Your Connection Details (30 seconds)
-
-1. Go to **Settings** > **API** in Supabase
+### 3. Get Your Credentials
+1. In your Supabase dashboard, go to **Settings** → **API**
 2. Copy these two values:
-   - **Project URL** (looks like: `https://xyz.supabase.co`)
-   - **anon public key** (starts with: `eyJ...`)
+   - **Project URL** (looks like: `https://abcdefgh.supabase.co`)
+   - **anon public key** (long string starting with `eyJ`)
 
-## 4. Add to Replit Secrets (30 seconds)
+### 4. Add to Replit Secrets
+1. In your Replit project, click the **Secrets** tab (lock icon)
+2. Add these secrets:
+   - **Key**: `SUPABASE_URL` **Value**: [paste your Project URL]
+   - **Key**: `SUPABASE_KEY` **Value**: [paste your anon public key]
 
-1. In Replit, click the **Secrets** tab (🔒 icon)
-2. Add secret: `SUPABASE_URL` = your Project URL
-3. Add secret: `SUPABASE_KEY` = your anon public key
+### 5. Restart Your App
+1. The app will automatically detect Supabase credentials
+2. Database tables will be created automatically
+3. Your data will now persist between sessions!
 
-## 5. Restart and Test (30 seconds)
-
-1. Restart your Replit app
-2. Look for: `✅ Connected to Supabase database - all data will be persisted`
-3. Your app now uses permanent cloud storage!
-
-## What You Get
-
-- **Never lose data** - survives restarts, deployments, code changes
-- **Real-time sync** - changes saved instantly to cloud database  
-- **Multi-user ready** - can handle multiple users and accounts
-- **Professional grade** - same database used by major companies
+## Benefits After Setup
+- ✅ Data persists between sessions
+- ✅ Automatic backups by Supabase
+- ✅ Can access your budget from any device
+- ✅ Free tier includes 500MB storage + 2GB bandwidth
 
 ## Troubleshooting
-
-**Still seeing "in-memory storage"?**
-- Check your secrets are named exactly: `SUPABASE_URL` and `SUPABASE_KEY`
-- Verify you ran the SQL schema in Step 2
-- Make sure your Supabase project is active (not paused)
-
-**Need help?** Check `SUPABASE_SETUP.md` for detailed instructions.
+- If you see connection errors, double-check your credentials
+- Make sure there are no extra spaces in the secret values
+- The app will fall back to in-memory storage if Supabase isn't configured
 
 ---
-
-**Total setup time: ~4 minutes**  
-**Result: Professional cloud database with permanent data storage**
+*The app works perfectly with in-memory storage too - Supabase just adds persistence!*
