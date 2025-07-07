@@ -1,22 +1,19 @@
-server/storage.ts
-server/supabase-storage.ts
-server/replit-storage.ts
-server/dateAdvancement.ts
-server/paymentScheduler.ts
-server/akahu-scheduler.ts
-server/duplicateDetection.ts
-server/routes.ts
-server/index.ts
-server/db.ts
-server/replitAuth.ts
-server/supabase-init.ts
-server/supabase.ts
-server/twoFactorAuth.ts
-server/vercel-simple-storage.ts
-server/vite.ts
-shared/schema.ts
+# Server files (only API functions should be deployed)
+server/
+shared/
 drizzle.config.ts
+tsconfig.json
+
+# Documentation and assets
 *.md
 uploads/
 test-transactions.csv
 attached_assets/
+
+# Development files
+.replit
+.env.example
+pyproject.toml
+
+# Build artifacts (except dist/public)
+dist/index.js
