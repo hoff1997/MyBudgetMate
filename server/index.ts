@@ -103,9 +103,18 @@ async function initializeDatabase() {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  console.log(`Environment: ${app.get("env")}, NODE_ENV: ${process.env.NODE_ENV}`);
+  
+  // Force development mode for Replit
+  const isDevelopment = process.env.NODE_ENV === "development" || app.get("env") === "development";
+  console.log(`isDevelopment: ${isDevelopment}`);
+  
+  if (isDevelopment) {
+    console.log("Setting up Vite development server...");
     await setupVite(app, server);
+    console.log("Vite development server setup complete");
   } else {
+    console.log("Setting up static file serving...");
     serveStatic(app);
   }
 
