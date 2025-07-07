@@ -183,6 +183,7 @@ export const transactionLabels = pgTable("transaction_labels", {
 
 export type TransactionLabel = typeof transactionLabels.$inferSelect;
 export type Label = typeof labels.$inferSelect;
+export type InsertLabel = typeof insertLabelSchema._type;
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -248,6 +249,43 @@ export const insertLabelSchema = createInsertSchema(labels).omit({
 export const insertTransactionLabelSchema = createInsertSchema(transactionLabels).omit({
   id: true,
 });
+
+// Net Worth tables
+export const assets = pgTable("assets", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const liabilities = pgTable("liabilities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  balance: decimal("balance", { precision: 10, scale: 2 }).notNull(),
+  interestRate: decimal("interest_rate", { precision: 5, scale: 2 }),
+  minimumPayment: decimal("minimum_payment", { precision: 10, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const netWorthSnapshots = pgTable("net_worth_snapshots", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  totalAssets: decimal("total_assets", { precision: 10, scale: 2 }).notNull(),
+  totalLiabilities: decimal("total_liabilities", { precision: 10, scale: 2 }).notNull(),
+  netWorth: decimal("net_worth", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Export types
+export type Asset = typeof assets.$inferSelect;
+export type Liability = typeof liabilities.$inferSelect;
+export type NetWorthSnapshot = typeof netWorthSnapshots.$inferSelect;
 
 // Types
 export type User = typeof users.$inferSelect;
