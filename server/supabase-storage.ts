@@ -23,7 +23,7 @@ import type {
   RecurringTransaction, InsertRecurringTransaction,
   RecurringTransactionSplit, InsertRecurringTransactionSplit,
   BankConnection, InsertBankConnection,
-  Label, InsertLabel,
+  Label,
   TransactionLabel
 } from '../shared/schema';
 

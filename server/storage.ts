@@ -1,5 +1,5 @@
 import { 
-  users, accounts, envelopes, envelopeCategories, transactions, transactionEnvelopes, categoryRules, merchantMemory, bankConnections, recurringTransactions, recurringTransactionSplits, assets, liabilities, netWorthSnapshots, labels, transactionLabels, envelopeTypes,
+  users, accounts, envelopes, envelopeCategories, transactions, transactionEnvelopes, categoryRules, merchantMemory, bankConnections, recurringTransactions, recurringTransactionSplits, labels, transactionLabels, envelopeTypes,
   type User, type InsertUser,
   type Account, type InsertAccount,
   type Envelope, type InsertEnvelope,

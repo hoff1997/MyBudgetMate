@@ -1,53 +1,45 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-import { getVercelStorage } from '../../server/vercel-storage';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'demo-secret-change-in-production';
+// Demo credentials for Vercel deployment
+const DEMO_CREDENTIALS = {
+  'demo': 'mybudgetmate',
+  'user': 'demo123', 
+  'test': 'budgetmate'
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  try {
-    const { password, username } = req.body;
-    const storage = await getVercelStorage();
+  const { username, password } = req.body;
 
-    // Demo authentication for Vercel deployment
-    if (password === 'demo123' || password === 'budgetmate' || password === 'mybudgetmate') {
-      let user = await storage.getUserByUsername(username || 'demo');
-      
-      if (!user) {
-        // Create new user with basic info
-        user = await storage.createUser({
-          username: username || 'demo',
-          password: null // No password for demo
-        });
-      }
-
-      // Generate JWT token
-      const token = jwt.sign(
-        { userId: user.id.toString(), username: user.username },
-        JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-
-      res.json({
-        success: true,
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName
-        }
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid credentials. Use: demo123, budgetmate, or mybudgetmate' });
-    }
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Login failed' });
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password required' });
   }
+
+  // Check demo credentials
+  if (DEMO_CREDENTIALS[username as keyof typeof DEMO_CREDENTIALS] !== password) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  // Generate JWT token
+  const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
+  const token = jwt.sign(
+    { userId: '1', username },
+    JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  res.json({ 
+    token,
+    user: {
+      id: 1,
+      username,
+      email: `${username}@example.com`,
+      firstName: username.charAt(0).toUpperCase() + username.slice(1),
+      lastName: 'User'
+    }
+  });
 }
