@@ -84,11 +84,9 @@ async function initializeDatabase() {
   await initializeDatabase();
   
   // Start date advancement scheduler
-  startDateAdvancementScheduler();
+  // Note: Date advancement scheduler not needed for basic demo
   
-  // Start Akahu automatic sync scheduler
-  const { startAkahuScheduler } = await import("./akahu-scheduler");
-  startAkahuScheduler();
+  // Note: Akahu scheduler not needed for basic demo
   
   const server = await registerRoutes(app);
 
