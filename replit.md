@@ -98,6 +98,15 @@ The application uses a comprehensive database schema with the following main ent
 ## Recent Changes
 
 Changelog:
+- July 7, 2025: **VERCEL DEPLOYMENT READY** - Complete Vercel serverless architecture implemented
+  - Created serverless API functions: `/api/auth/login`, `/api/auth/user`, `/api/envelopes`, `/api/transactions`, `/api/accounts`
+  - Implemented JWT-based authentication system for Vercel deployment
+  - Added Vercel-compatible storage layer with environment variable configuration
+  - Created comprehensive deployment guide (README-VERCEL.md)
+  - Configured vercel.json with proper build settings and routing
+  - Added demo authentication (passwords: mybudgetmate, demo123, budgetmate)
+  - Environment variables setup for JWT, database, and storage configuration
+  - Ready for one-click GitHub to Vercel deployment
 - June 22, 2025: Initial setup
 - June 22, 2025: Enhanced Quick Add form with date picker and receipt upload functionality
 - June 22, 2025: Created condensed envelope overview widget with account filtering
