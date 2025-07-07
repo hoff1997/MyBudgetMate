@@ -3,7 +3,7 @@
   "outputDirectory": "dist/public",
   "installCommand": "npm install",
   "functions": {
-    "api-vercel-disabled/**/*.ts": {
+    "api/**/*.ts": {
       "runtime": "@vercel/node@3.0.0"
     }
   },
