@@ -130,13 +130,18 @@ async function initializeDatabase() {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
+  const port = process.env.PORT || 5000;
+  console.log(`Starting server on port ${port} with host 0.0.0.0`);
+  
   server.listen({
-    port,
+    port: parseInt(port.toString()),
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`✅ My Budget Mate server successfully running on port ${port}`);
+    log(`🌐 External URL: https://mybudgetmate.replit.app/`);
+    log(`🔧 Debug URL: https://mybudgetmate.replit.app/debug-test`);
+    log(`📡 API URL: https://mybudgetmate.replit.app/api/ping`);
   });
 })();
 
