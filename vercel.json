@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx vite build",
+  "buildCommand": "./build.sh",
   "outputDirectory": "dist/public",
   "installCommand": "npm install",
   "functions": {
