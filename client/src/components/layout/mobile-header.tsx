@@ -87,6 +87,10 @@ export default function MobileHeader() {
   const navItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard" },
     { href: "/", icon: Scale, label: "Reconcile" },
+    { href: "/envelope-planning", icon: Target, label: "Budget", target: "_blank" },
+    { href: "/envelope-summary", icon: List, label: "Envelopes" },
+    { href: "/transactions", icon: Receipt, label: "Transactions" },
+    { href: "/accounts", icon: Wallet, label: "Accounts" },
     { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
@@ -142,7 +146,7 @@ export default function MobileHeader() {
                     <div className="space-y-1">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Navigation</p>
                       {navItems.map((item) => (
-                        item.label === "Balance Report" || item.label === "Getting Started" ? (
+                        item.label === "Balance Report" || item.label === "Getting Started" || item.target === "_blank" ? (
                           <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">
                             <Button
                               variant="ghost"

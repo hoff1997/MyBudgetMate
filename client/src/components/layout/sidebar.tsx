@@ -74,17 +74,13 @@ export default function Sidebar() {
 
   const navigationItems = [
     { href: "/setup", icon: Play, label: "Getting Started" },
-    { href: "/", icon: Home, label: "Reconcile" },
-    { href: "/dashboard", icon: Inbox, label: "Dashboard" },
-    { href: "/envelope-summary", icon: List, label: "Envelope Summary" },
-    { href: "/envelope-planning", icon: BarChart3, label: "Envelope Planning" },
-    { href: "/envelope-balances", icon: BarChart3, label: "Balance Report" },
-    { href: "/transactions", icon: List, label: "Transactions" },
-    { href: "/net-worth", icon: BarChart3, label: "Net Worth" },
-    { href: "/debt-management", icon: CreditCard, label: "Debt Management" },
+    { href: "/dashboard", icon: Home, label: "Dashboard" },
+    { href: "/", icon: Scale, label: "Reconcile" },
+    { href: "/envelope-planning", icon: Target, label: "Budget", target: "_blank" },
+    { href: "/envelope-summary", icon: List, label: "Envelopes" },
+    { href: "/envelope-balances", icon: BarChart3, label: "Balance Report", target: "_blank" },
+    { href: "/transactions", icon: Receipt, label: "Transactions" },
     { href: "/accounts", icon: Wallet, label: "Accounts" },
-    { href: "/recurring-income", icon: RotateCcw, label: "Recurring Income" },
-    { href: "/reports", icon: GitBranch, label: "Reports" },
     { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
@@ -146,7 +142,7 @@ export default function Sidebar() {
         <nav className="flex-1 px-2 py-4 space-y-1">
           {navigationItems.map((item) => {
             const isActive = location === item.href;
-            return item.label === "Getting Started" ? (
+            return (item.label === "Getting Started" || item.target === "_blank") ? (
               <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">
                 <div className={cn(
                   "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer",
