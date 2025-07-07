@@ -182,8 +182,6 @@ export const transactionLabels = pgTable("transaction_labels", {
 });
 
 export type TransactionLabel = typeof transactionLabels.$inferSelect;
-export type Label = typeof labels.$inferSelect;
-export type InsertLabel = typeof insertLabelSchema._type;
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -283,9 +281,7 @@ export const netWorthSnapshots = pgTable("net_worth_snapshots", {
 });
 
 // Export types
-export type Asset = typeof assets.$inferSelect;
-export type Liability = typeof liabilities.$inferSelect;
-export type NetWorthSnapshot = typeof netWorthSnapshots.$inferSelect;
+// Remove duplicate Asset exports - they exist later in file
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -296,9 +292,6 @@ export type InsertAccount = z.infer<typeof insertAccountSchema>;
 
 export type Envelope = typeof envelopes.$inferSelect;
 export type InsertEnvelope = z.infer<typeof insertEnvelopeSchema>;
-
-export type EnvelopeCategory = typeof envelopeCategories.$inferSelect;
-export type InsertEnvelopeCategory = z.infer<typeof insertEnvelopeCategorySchema>;
 
 export type EnvelopeCategory = typeof envelopeCategories.$inferSelect;
 export type InsertEnvelopeCategory = z.infer<typeof insertEnvelopeCategorySchema>;
@@ -322,6 +315,10 @@ export type InsertLiability = z.infer<typeof insertLiabilitySchema>;
 
 export type NetWorthSnapshot = typeof netWorthSnapshots.$inferSelect;
 export type InsertNetWorthSnapshot = z.infer<typeof insertNetWorthSnapshotSchema>;
+
+// Add missing InsertLabel export
+export type Label = typeof labels.$inferSelect;
+export type InsertLabel = z.infer<typeof insertLabelSchema>;
 
 export type RecurringTransaction = typeof recurringTransactions.$inferSelect;
 export type InsertRecurringTransaction = z.infer<typeof insertRecurringTransactionSchema>;
@@ -364,3 +361,21 @@ export const insertEnvelopeTypeSchema = createInsertSchema(envelopeTypes).omit({
 
 export type EnvelopeType = typeof envelopeTypes.$inferSelect;
 export type InsertEnvelopeType = z.infer<typeof insertEnvelopeTypeSchema>;
+
+// Insert schemas for net worth (defined after tables)
+export const insertAssetSchema = createInsertSchema(assets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertLiabilitySchema = createInsertSchema(liabilities).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertNetWorthSnapshotSchema = createInsertSchema(netWorthSnapshots).omit({
+  id: true,
+  createdAt: true,
+});

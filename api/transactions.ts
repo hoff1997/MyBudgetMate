@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { withAuth } from '../server/vercel-storage';
+import { withAuth, vercelStorage } from '../server/vercel-simple-storage';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  return withAuth(async (userId, storage) => {
+  return withAuth(async (userId) => {
     switch (req.method) {
       case 'GET':
-        const transactions = await storage.getTransactionsByUserId(userId);
+        const transactions = await vercelStorage.getTransactionsByUserId(userId);
         return res.json(transactions);
 
       case 'POST':
@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ message: 'Merchant, amount, and account are required' });
         }
 
-        const newTransaction = await storage.createTransaction({
+        const newTransaction = await vercelStorage.createTransaction({
           userId: parseInt(userId),
           accountId: parseInt(accountId),
           merchant,

@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { withAuth } from '../server/vercel-storage';
+import { withAuth, vercelStorage } from '../server/vercel-simple-storage';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  return withAuth(async (userId, storage) => {
+  return withAuth(async (userId) => {
     switch (req.method) {
       case 'GET':
-        const accounts = await storage.getAccountsByUserId(userId);
+        const accounts = await vercelStorage.getAccountsByUserId(userId);
         return res.json(accounts);
 
       case 'POST':
@@ -15,7 +15,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ message: 'Account name and type are required' });
         }
 
-        const newAccount = await storage.createAccount({
+        const newAccount = await vercelStorage.createAccount({
           userId: parseInt(userId),
           name,
           type,
