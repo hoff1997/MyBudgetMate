@@ -100,6 +100,15 @@ async function initializeDatabase() {
     throw err;
   });
 
+  // Add a test route BEFORE Vite to debug the issue
+  app.get('/debug-test', (req, res) => {
+    res.json({ 
+      message: 'Express route working!',
+      timestamp: new Date().toISOString(),
+      path: req.path
+    });
+  });
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
