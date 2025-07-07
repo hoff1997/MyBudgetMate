@@ -1,15 +1,22 @@
-# Exclude problematic storage files from Vercel build
 server/storage.ts
 server/supabase-storage.ts
 server/replit-storage.ts
-server/replitAuth.ts
+server/dateAdvancement.ts
+server/paymentScheduler.ts
+server/akahu-scheduler.ts
+server/duplicateDetection.ts
 server/routes.ts
 server/index.ts
 server/db.ts
-server/akahu-scheduler.ts
-server/dateAdvancement.ts
-server/duplicateDetection.ts
-server/paymentScheduler.ts
-
-# Keep only essential files for Vercel serverless functions
-!server/vercel-simple-storage.ts
+server/replitAuth.ts
+server/supabase-init.ts
+server/supabase.ts
+server/twoFactorAuth.ts
+server/vercel-simple-storage.ts
+server/vite.ts
+shared/schema.ts
+drizzle.config.ts
+*.md
+uploads/
+test-transactions.csv
+attached_assets/
