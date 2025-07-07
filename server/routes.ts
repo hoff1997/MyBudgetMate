@@ -43,7 +43,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve uploaded files
   app.use('/uploads', express.static(uploadsDir));
 
-  // Setup Replit Auth
+  // Simple health check route
+  app.get('/api/ping', (req, res) => {
+    res.json({ 
+      status: 'success', 
+      message: 'My Budget Mate Replit API is working!',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
+  // Root route for testing
+  app.get('/test', (req, res) => {
+    res.json({ 
+      status: 'success', 
+      message: 'My Budget Mate root test working!',
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Setup Replit Auth FIRST
   await setupAuth(app);
 
   // Auth routes
@@ -2127,6 +2146,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to sync Akahu transactions" });
     }
   });
+
+  // Add catch-all routes AFTER all specific API routes
+  
+  // Handle any unmatched API routes
+  app.use('/api/*', (req, res) => {
+    res.status(404).json({ 
+      error: 'API endpoint not found',
+      path: req.path,
+      method: req.method,
+      message: 'This API endpoint is not implemented in the Replit environment'
+    });
+  });
+
+
 
   const httpServer = createServer(app);
   return httpServer;
