@@ -1,12 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "client/**/*",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist/public" }
-    }
-  ],
+  "buildCommand": "vite build",
+  "outputDirectory": "dist/public",
+  "installCommand": "npm install",
   "functions": {
     "api/**/*.ts": {
       "runtime": "nodejs18.x"
@@ -19,9 +14,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/public/$1"
+      "dest": "/index.html"
     }
-  ],
-  "installCommand": "npm install",
-  "buildCommand": "vite build"
+  ]
 }
