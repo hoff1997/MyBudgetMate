@@ -1,52 +1,96 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
-import { storage } from '../../server/storage';
-import { insertEnvelopeSchema } from '../../shared/schema';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+// Demo data for Vercel deployment
+const DEMO_ENVELOPES = [
+  {
+    id: 1,
+    name: 'Groceries',
+    icon: '🛒',
+    budgetedAmount: '600.00',
+    currentBalance: '450.00',
+    categoryId: 1,
+    userId: 1,
+    isActive: true,
+    isMonitored: true,
+    sortOrder: 1
+  },
+  {
+    id: 2,
+    name: 'Entertainment',
+    icon: '🎬',
+    budgetedAmount: '200.00',
+    currentBalance: '150.00',
+    categoryId: 2,
+    userId: 1,
+    isActive: true,
+    isMonitored: false,
+    sortOrder: 2
+  },
+  {
+    id: 3,
+    name: 'Transportation',
+    icon: '🚗',
+    budgetedAmount: '300.00',
+    currentBalance: '250.00',
+    categoryId: 3,
+    userId: 1,
+    isActive: true,
+    isMonitored: true,
+    sortOrder: 3
+  }
+];
 
-function getAuthenticatedUser(req: VercelRequest): string | null {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  
+function verifyToken(token: string) {
   try {
-    const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    return decoded.userId;
-  } catch {
+    const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
+    return jwt.verify(token, JWT_SECRET);
+  } catch (error) {
     return null;
   }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const userIdStr = getAuthenticatedUser(req);
-  if (!userIdStr) {
+  // Check authentication
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  const userId = parseInt(userIdStr);
+  const token = authHeader.substring(7);
+  const user = verifyToken(token);
+  if (!user) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
 
-  try {
-    switch (req.method) {
-      case 'GET':
-        const envelopes = await storage.getEnvelopesByUserId(userId.toString());
-        return res.json(envelopes);
+  switch (req.method) {
+    case 'GET':
+      return res.json(DEMO_ENVELOPES);
 
-      case 'POST':
-        const validation = insertEnvelopeSchema.safeParse(req.body);
-        if (!validation.success) {
-          return res.status(400).json({ message: 'Invalid envelope data' });
-        }
-        
-        const envelopeData = { ...validation.data, userId };
-        const newEnvelope = await storage.createEnvelope(envelopeData);
-        return res.status(201).json(newEnvelope);
+    case 'POST':
+      const { name, icon, budgetedAmount, categoryId } = req.body;
+      
+      if (!name || !budgetedAmount) {
+        return res.status(400).json({ message: 'Name and budgeted amount required' });
+      }
 
-      default:
-        return res.status(405).json({ message: 'Method not allowed' });
-    }
-  } catch (error) {
-    console.error('Envelopes API error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+      const newEnvelope = {
+        id: DEMO_ENVELOPES.length + 1,
+        name,
+        icon: icon || '📝',
+        budgetedAmount,
+        currentBalance: '0.00',
+        categoryId: categoryId || 1,
+        userId: 1,
+        isActive: true,
+        isMonitored: false,
+        sortOrder: DEMO_ENVELOPES.length + 1
+      };
+
+      DEMO_ENVELOPES.push(newEnvelope);
+      return res.status(201).json(newEnvelope);
+
+    default:
+      return res.status(405).json({ message: 'Method not allowed' });
   }
 }
