@@ -83,7 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         isTransfer: false
       };
 
-      DEMO_TRANSACTIONS.push(newTransaction);
+      DEMO_TRANSACTIONS.push(newTransaction as any);
       return res.status(201).json(newTransaction);
 
     default:

@@ -71,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         isActive: true
       };
 
-      DEMO_ACCOUNTS.push(newAccount);
+      DEMO_ACCOUNTS.push(newAccount as any);
       return res.status(201).json(newAccount);
 
     default:

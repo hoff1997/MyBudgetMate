@@ -87,7 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         sortOrder: DEMO_ENVELOPES.length + 1
       };
 
-      DEMO_ENVELOPES.push(newEnvelope);
+      DEMO_ENVELOPES.push(newEnvelope as any);
       return res.status(201).json(newEnvelope);
 
     default:
