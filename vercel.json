@@ -16,6 +16,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "nodeVersion": "18.x"
+  ]
 }
