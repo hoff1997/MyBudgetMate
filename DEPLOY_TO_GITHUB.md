@@ -9,7 +9,7 @@ Your My Budget Mate application is **fully functional** and ready for GitHub dep
 - ✅ **Authentication working** via Replit Auth
 - ✅ **Transaction management** functional
 - ✅ **Dual deployment ready** (Replit + Vercel)
-- ✅ **GitHub repository connected**: `https://github.com/hoff1997/MyBudgetMate`
+- ✅ **GitHub repository connected**: `https://github.com/hoff1997/Replit-My-Budget-Mate.git`
 
 ## Push to GitHub (Manual Steps)
 

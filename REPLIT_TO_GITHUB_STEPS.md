@@ -20,12 +20,12 @@ git push origin main
 
 ### Step 2: Deploy to Vercel (Production)
 1. Visit: https://vercel.com/new
-2. Import from GitHub: `hoff1997/MyBudgetMate`
+2. Import from GitHub: `hoff1997/Replit-My-Budget-Mate`
 3. Add environment variable: `JWT_SECRET=your-secret-key`
 4. Click Deploy
 
 ### Step 3: Edit on GitHub
-- Browse files at: https://github.com/hoff1997/MyBudgetMate
+- Browse files at: https://github.com/hoff1997/Replit-My-Budget-Mate
 - Edit directly in browser or clone locally
 
 ## Current State ✅
